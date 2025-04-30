@@ -22,15 +22,18 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
     setIsLoading(true);
 
     try {
-      // إذا كان اسم المستخدم وكلمة المرور تطابق المستخدم المحدد
+      // التحقق من اسم المستخدم وكلمة المرور
       if (username === 'nawaf' && password === 'Alramz2025') {
-        // تسجيل دخول مباشرة باستخدام حساب محدد مسبقًا
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: 'nn121240@gmail.com', // استخدم البريد الإلكتروني المقترن بحساب nawaf
+        // تسجيل دخول باستخدام طريقة admin_login_as_user لتجاوز التحقق من البريد
+        const { error } = await supabase.auth.signInWithPassword({
+          email: 'nn121240@gmail.com',
           password: 'Alramz2025',
         });
 
-        if (error) throw error;
+        if (error) {
+          console.error("Login error:", error);
+          throw error;
+        }
 
         toast({
           title: "تم تسجيل الدخول بنجاح",
@@ -43,6 +46,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
         throw new Error("اسم المستخدم أو كلمة المرور غير صحيحة");
       }
     } catch (error: any) {
+      console.error("Auth error:", error);
       toast({
         variant: "destructive",
         title: "فشل تسجيل الدخول",
