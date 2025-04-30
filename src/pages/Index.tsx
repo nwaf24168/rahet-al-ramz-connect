@@ -3,17 +3,35 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthForm from "@/components/AuthForm";
 import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Index() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
   
   useEffect(() => {
-    const user = localStorage.getItem("user");
-    if (user) {
-      setIsAuthenticated(true);
-      navigate("/dashboard");
-    }
+    // Check current auth session on load
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        setIsAuthenticated(true);
+        navigate("/dashboard");
+      }
+    };
+    
+    checkSession();
+    
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (event === 'SIGNED_IN' && session) {
+          setIsAuthenticated(true);
+          navigate("/dashboard");
+        }
+      }
+    );
+    
+    return () => subscription.unsubscribe();
   }, [navigate]);
   
   const handleLoginSuccess = () => {

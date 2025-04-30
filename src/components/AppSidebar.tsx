@@ -12,42 +12,66 @@ import {
   SidebarMenuItem,
   SidebarMenuButton 
 } from "@/components/ui/sidebar";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import Logo from "./Logo";
 
 export function AppSidebar() {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  
   // Menu items
   const mainMenuItems = [
     {
       title: "الرئيسية",
       icon: Home,
       url: "/dashboard",
-      active: true
+      active: window.location.pathname === "/dashboard"
     },
     {
       title: "المكالمات",
       icon: Phone,
       url: "/calls",
+      active: window.location.pathname === "/calls"
     },
     {
       title: "التقارير",
       icon: BarChart3,
       url: "/reports",
+      active: window.location.pathname === "/reports"
     },
     {
       title: "العملاء",
       icon: Users,
       url: "/customers",
+      active: window.location.pathname === "/customers"
     },
     {
       title: "الإعدادات",
       icon: Settings,
       url: "/settings",
+      active: window.location.pathname === "/settings"
     },
   ];
 
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    window.location.href = '/';
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      toast({
+        title: "تم تسجيل الخروج بنجاح",
+      });
+      
+      navigate('/');
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "حدث خطأ",
+        description: error.message || "فشل تسجيل الخروج"
+      });
+    }
   };
 
   return (
