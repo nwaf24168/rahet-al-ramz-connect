@@ -37,8 +37,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
           throw checkError;
         }
 
-        // Sign in directly with credentials
-        const { data, error } = await supabase.auth.signInWithEmailAndPassword({
+        // Sign in directly with credentials using the correct method name
+        const { data, error } = await supabase.auth.signInWithPassword({
           email: 'nn121240@gmail.com',
           password: 'Alramz2025',
         });
