@@ -24,8 +24,21 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
     try {
       // التحقق من اسم المستخدم وكلمة المرور
       if (username === 'nawaf' && password === 'Alramz2025') {
-        // تسجيل دخول باستخدام طريقة admin_login_as_user لتجاوز التحقق من البريد
-        const { error } = await supabase.auth.signInWithPassword({
+        // Use the signIn method with admin credentials
+        // First check if user exists in supabase
+        const { data: existingUsers, error: checkError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('full_name', 'nawaf')
+          .limit(1);
+          
+        if (checkError) {
+          console.error("Error checking user:", checkError);
+          throw checkError;
+        }
+
+        // Sign in directly with credentials
+        const { data, error } = await supabase.auth.signInWithEmailAndPassword({
           email: 'nn121240@gmail.com',
           password: 'Alramz2025',
         });
